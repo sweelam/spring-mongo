@@ -2,25 +2,25 @@ package com.learning.springmongo.service;
 
 import com.learning.springmongo.model.Population;
 import com.learning.springmongo.repository.PopulationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class PopulationService {
-    @Autowired
     private PopulationRepository repository;
 
-    public Population getPop() {
-        return repository.findById("5de3dd430b2684731dd76998").get();
+    public Mono<Population> getPop() {
+        return repository.findById("5de3dd430b2684731dd76998");
     }
 
-    public List<Population> getPop(String countryName, long population) {
+    public Mono<List<Population>> getPop(String countryName, long population) {
         return repository.findByCountryNameAndPopulation(countryName, population)
-                .stream()
-                .limit(5)
-                .collect(Collectors.toList());
+                .limitRequest(5)
+                .log()
+                .collectList();
     }
 }
